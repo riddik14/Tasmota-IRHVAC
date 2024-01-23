@@ -44,13 +44,13 @@ from homeassistant.components.climate.const import (
     CURRENT_HVAC_COOL,
     CURRENT_HVAC_DRY,
     CURRENT_HVAC_FAN,
-    CURRENT_HVAC_OFF,
+    HVACAction.OFF,
     PRESET_AWAY,
     PRESET_NONE,
-    SUPPORT_FAN_MODE,
-    SUPPORT_SWING_MODE,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
+    ClimateEntityFeature.FAN_MODE,
+    ClimateEntityFeature.SWING_MODE,
+    ClimateEntityFeature.PRESET_MODE,
+    ClimateEntityFeature.TARGET_TEMPERATURE,
     SWING_BOTH,
     SWING_HORIZONTAL,
     SWING_OFF,
@@ -195,8 +195,8 @@ DEFAULT_INITIAL_OPERATION_MODE = HVAC_MODE_OFF
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_FLAGS = (
-    SUPPORT_TARGET_TEMPERATURE
-    | SUPPORT_FAN_MODE
+    ClimateEntityFeature.TARGET_TEMPERATURE
+    | ClimateEntityFeature.FAN_MODE
 )
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
@@ -500,9 +500,9 @@ class TasmotaIrhvac(ClimateEntity, RestoreEntity, MqttAvailability):
         self._unit = hass.config.units.temperature_unit
         self._support_flags = SUPPORT_FLAGS
         if self._away_temp is not None:
-            self._support_flags = self._support_flags | SUPPORT_PRESET_MODE
+            self._support_flags = self._support_flags | ClimateEntityFeature.PRESET_MODE
         if self._swing_mode is not None:
-            self._support_flags = self._support_flags | SUPPORT_SWING_MODE
+            self._support_flags = self._support_flags | ClimateEntityFeature.SWING_MODE
         self._is_away = False
         self._modes_list = config[CONF_MODES_LIST]
         self._quiet = config[CONF_QUIET].lower()
@@ -836,7 +836,7 @@ class TasmotaIrhvac(ClimateEntity, RestoreEntity, MqttAvailability):
         Need to be one of CURRENT_HVAC_*.
         """
         if self._hvac_mode == HVAC_MODE_OFF:
-            return CURRENT_HVAC_OFF
+            return HVACAction.OFF
         elif self._hvac_mode == HVAC_MODE_HEAT:
             return CURRENT_HVAC_HEAT
         elif self._hvac_mode == HVAC_MODE_COOL:
@@ -870,7 +870,7 @@ class TasmotaIrhvac(ClimateEntity, RestoreEntity, MqttAvailability):
     def fan_mode(self):
         """Return the list of available fan modes.
 
-        Requires SUPPORT_FAN_MODE.
+        Requires ClimateEntityFeature.FAN_MODE.
         """
         return self._fan_mode
 
@@ -878,7 +878,7 @@ class TasmotaIrhvac(ClimateEntity, RestoreEntity, MqttAvailability):
     def fan_modes(self):
         """Return the list of available fan modes.
 
-        Requires SUPPORT_FAN_MODE.
+        Requires ClimateEntityFeature.FAN_MODE.
         """
         # tweak for some ELECTRA_AC devices
         if HVAC_FAN_MAX_HIGH in self._fan_list and HVAC_FAN_AUTO_MAX in self._fan_list:
@@ -897,7 +897,7 @@ class TasmotaIrhvac(ClimateEntity, RestoreEntity, MqttAvailability):
     def swing_mode(self):
         """Return the swing setting.
 
-        Requires SUPPORT_SWING_MODE.
+        Requires ClimateEntityFeature.SWING_MODE.
         """
         return self._swing_mode
 
@@ -905,7 +905,7 @@ class TasmotaIrhvac(ClimateEntity, RestoreEntity, MqttAvailability):
     def swing_modes(self):
         """Return the list of available swing modes.
 
-        Requires SUPPORT_SWING_MODE.
+        Requires ClimateEntityFeature.SWING_MODE.
         """
         return self._swing_list
 
